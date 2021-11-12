@@ -5,5 +5,6 @@
 # But not these files...
 !.gitignore
 !figures/
+!imgs/
 !Stitching Tutorial.ipynb
 !README.md
