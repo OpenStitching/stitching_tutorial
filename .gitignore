@@ -6,5 +6,6 @@
 !.gitignore
 !figures/
 !imgs/
+!index.html
 !Stitching Tutorial.ipynb
 !README.md
