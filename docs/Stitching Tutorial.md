@@ -37,8 +37,6 @@ budapest_imgs = get_image_paths('buda')
 exposure_error_imgs = get_image_paths('exp')
 ```
 
-**NOTE:** The [opencv_stitching](https://github.com/opencv/opencv/tree/master/apps/opencv_stitching_tool/opencv_stitching) package needs to be pulled into [opencv_stitching_tutorial](https://github.com/lukasalexanderweber/opencv_stitching_tutorial/) for the Notebook to be run correctly!
-
 ## Resize Images
 
 The first step is to resize the images to medium (and later to low) resolution. The class which can be used is the `ImageHandler` class. If the images should not be stitched on full resolution, this can be achieved by setting the `final_megapix` parameter to a number above 0. 
@@ -69,7 +67,7 @@ plot_images(low_imgs, (20,20))
 
 
     
-![png](Stitching%20Tutorial_files/Stitching%20Tutorial_9_0.png)
+![png](Stitching%20Tutorial_files/Stitching%20Tutorial_8_0.png)
     
 
 
@@ -121,7 +119,7 @@ plot_image(keypoints_center_img, (15,10))
 
 
     
-![png](Stitching%20Tutorial_files/Stitching%20Tutorial_15_0.png)
+![png](Stitching%20Tutorial_files/Stitching%20Tutorial_14_0.png)
     
 
 
@@ -184,7 +182,7 @@ for idx1, idx2, img in all_relevant_matches:
 
 
     
-![png](Stitching%20Tutorial_files/Stitching%20Tutorial_22_1.png)
+![png](Stitching%20Tutorial_files/Stitching%20Tutorial_21_1.png)
     
 
 
@@ -193,7 +191,7 @@ for idx1, idx2, img in all_relevant_matches:
 
 
     
-![png](Stitching%20Tutorial_files/Stitching%20Tutorial_22_3.png)
+![png](Stitching%20Tutorial_files/Stitching%20Tutorial_21_3.png)
     
 
 
@@ -221,8 +219,9 @@ print(dot_notation)
 
 The matches graph visualizes what we've saw in the confidence matrix: image 1 conneced to image 2 conneced to image 3. Image 4 is not part of the panorama (note that the confidences can vary since this is a static image). 
 
-<img src="./figures/match_graph.svg" alt="match_graph.svg" width="200"/>
-<p style="text-align: center;"><a href="https://dreampuf.github.io/GraphvizOnline">GraphvizOnline</a> used to plot the graph </p>
+![match_graph](https://github.com/lukasalexanderweber/opencv_stitching_tutorial/blob/main/docs/static_files/match_graph.png?raw=true)
+
+[GraphvizOnline](https://dreampuf.github.io/GraphvizOnline) is used to plot the graph
 
 We now want to subset all variables we've created till here, incl. the attributes `img_names` and `img_sizes` of the `ImageHandler`
 
@@ -323,13 +322,13 @@ plot_images(warped_low_masks, (10,10))
 
 
     
-![png](Stitching%20Tutorial_files/Stitching%20Tutorial_38_0.png)
+![png](Stitching%20Tutorial_files/Stitching%20Tutorial_37_0.png)
     
 
 
 
     
-![png](Stitching%20Tutorial_files/Stitching%20Tutorial_38_1.png)
+![png](Stitching%20Tutorial_files/Stitching%20Tutorial_37_1.png)
     
 
 
@@ -366,19 +365,19 @@ for img, corner in zip(warped_final_imgs, final_corners):
 
 
     
-![png](Stitching%20Tutorial_files/Stitching%20Tutorial_42_0.png)
+![png](Stitching%20Tutorial_files/Stitching%20Tutorial_41_0.png)
     
 
 
 
     
-![png](Stitching%20Tutorial_files/Stitching%20Tutorial_42_1.png)
+![png](Stitching%20Tutorial_files/Stitching%20Tutorial_41_1.png)
     
 
 
 
     
-![png](Stitching%20Tutorial_files/Stitching%20Tutorial_42_2.png)
+![png](Stitching%20Tutorial_files/Stitching%20Tutorial_41_2.png)
     
 
 
@@ -405,7 +404,7 @@ plot_image(mask, (5,5))
 
 
     
-![png](Stitching%20Tutorial_files/Stitching%20Tutorial_46_0.png)
+![png](Stitching%20Tutorial_files/Stitching%20Tutorial_45_0.png)
     
 
 
@@ -435,7 +434,7 @@ plot_image(plot, (5,5))
 
 
     
-![png](Stitching%20Tutorial_files/Stitching%20Tutorial_51_0.png)
+![png](Stitching%20Tutorial_files/Stitching%20Tutorial_50_0.png)
     
 
 
@@ -452,7 +451,7 @@ plot_image(plot, (5,5))
 
 
     
-![png](Stitching%20Tutorial_files/Stitching%20Tutorial_53_0.png)
+![png](Stitching%20Tutorial_files/Stitching%20Tutorial_52_0.png)
     
 
 
@@ -467,7 +466,7 @@ plot_image(plot, (5,5))
 
 
     
-![png](Stitching%20Tutorial_files/Stitching%20Tutorial_55_0.png)
+![png](Stitching%20Tutorial_files/Stitching%20Tutorial_54_0.png)
     
 
 
@@ -482,7 +481,7 @@ plot_image(plot, (2.5,2.5))
 
 
     
-![png](Stitching%20Tutorial_files/Stitching%20Tutorial_57_0.png)
+![png](Stitching%20Tutorial_files/Stitching%20Tutorial_56_0.png)
     
 
 
@@ -517,19 +516,19 @@ for img, corner in zip(cropped_final_imgs, final_corners):
 
 
     
-![png](Stitching%20Tutorial_files/Stitching%20Tutorial_61_0.png)
+![png](Stitching%20Tutorial_files/Stitching%20Tutorial_60_0.png)
     
 
 
 
     
-![png](Stitching%20Tutorial_files/Stitching%20Tutorial_61_1.png)
+![png](Stitching%20Tutorial_files/Stitching%20Tutorial_60_1.png)
     
 
 
 
     
-![png](Stitching%20Tutorial_files/Stitching%20Tutorial_61_2.png)
+![png](Stitching%20Tutorial_files/Stitching%20Tutorial_60_2.png)
     
 
 
@@ -562,7 +561,7 @@ plot_images(seam_masks_plots, (15,10))
 
 
     
-![png](Stitching%20Tutorial_files/Stitching%20Tutorial_64_0.png)
+![png](Stitching%20Tutorial_files/Stitching%20Tutorial_63_0.png)
     
 
 
@@ -615,7 +614,7 @@ plot_image(panorama, (20,20))
 
 
     
-![png](Stitching%20Tutorial_files/Stitching%20Tutorial_69_0.png)
+![png](Stitching%20Tutorial_files/Stitching%20Tutorial_68_0.png)
     
 
 
@@ -629,7 +628,7 @@ plot_image(blended_seam_masks, (5,5))
 
 
     
-![png](Stitching%20Tutorial_files/Stitching%20Tutorial_71_0.png)
+![png](Stitching%20Tutorial_files/Stitching%20Tutorial_70_0.png)
     
 
 
@@ -643,13 +642,13 @@ plot_image(seam_finder.draw_seam_polygons(panorama, blended_seam_masks), (15,10)
 
 
     
-![png](Stitching%20Tutorial_files/Stitching%20Tutorial_73_0.png)
+![png](Stitching%20Tutorial_files/Stitching%20Tutorial_72_0.png)
     
 
 
 
     
-![png](Stitching%20Tutorial_files/Stitching%20Tutorial_73_1.png)
+![png](Stitching%20Tutorial_files/Stitching%20Tutorial_72_1.png)
     
 
 
@@ -673,7 +672,7 @@ plot_image(panorama, (20,20))
 
 
     
-![png](Stitching%20Tutorial_files/Stitching%20Tutorial_76_0.png)
+![png](Stitching%20Tutorial_files/Stitching%20Tutorial_75_0.png)
     
 
 
@@ -702,7 +701,7 @@ plot_image(panorama, (20,20))
 
 
     
-![png](Stitching%20Tutorial_files/Stitching%20Tutorial_78_0.png)
+![png](Stitching%20Tutorial_files/Stitching%20Tutorial_77_0.png)
     
 
 
@@ -750,7 +749,7 @@ for ax in axs.flat:
 
 
     
-![png](Stitching%20Tutorial_files/Stitching%20Tutorial_81_0.png)
+![png](Stitching%20Tutorial_files/Stitching%20Tutorial_80_0.png)
     
 
 
