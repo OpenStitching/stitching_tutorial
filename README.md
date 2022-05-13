@@ -1,11 +1,31 @@
 ## OpenCV Stitching Tutorial
 
-To view the Tutorial, you can immedially open the .ipynb
+Preview the tutorial [here](https://github.com/lukasalexanderweber/stitching_tutorial/blob/master/docs/Stitching%20Tutorial.md)
 
-### Resources
+## Installation
 
-To run the Notebook, you need to have installed:
-- opencv >4.0.1
-- matplotlib
+Install the dependencies.
 
-Additionally, you need to put the [opencv_stitching package](https://github.com/opencv/opencv/tree/4.x/apps/opencv_stitching_tool/opencv_stitching) into the cloned repository
+```bash
+pip install -r requirements.txt
+```
+
+## Run the Notebook
+
+To run the tutorial an your machine and experiment e.g. with your own images put your images in the `imgs` directory and run the notebook using
+
+```bash
+jupyter notebook
+```
+
+## Contributing
+
+Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+
+Please make sure to update the preview using
+
+```bash
+jupyter nbconvert --to markdown "Stitching Tutorial.ipynb"
+```
+
+and put the resulting files in the `docs` directory
