@@ -90,13 +90,6 @@ print(f"Final Size:    {final_size}  -> {'{:,}'.format(np.prod(final_size))} px 
     Final Size:    (1333, 750)  -> 999,750 px ~ 1 MP
     
 
-For the next steps we work with the Medium Images:
-
-
-```python
-imgs = medium_imgs
-```
-
 ## Find Features
 
 On the medium images, we now want to find features that can describe conspicuous elements within the images which might be found in other images as well. The class which can be used is the `FeatureDetector` class. Default `detector` is SURF, if  [opencv_contrib](https://github.com/opencv/opencv_contrib) is not available, it's ORB.
@@ -108,8 +101,8 @@ On the medium images, we now want to find features that can describe conspicuous
 from stitching.feature_detector import FeatureDetector
 
 finder = FeatureDetector()
-features = [finder.detect_features(img) for img in imgs]
-keypoints_center_img = finder.draw_keypoints(imgs[1], features[1])
+features = [finder.detect_features(img) for img in medium_imgs]
+keypoints_center_img = finder.draw_keypoints(medium_imgs[1], features[1])
 ```
 
 
@@ -119,7 +112,7 @@ plot_image(keypoints_center_img, (15,10))
 
 
     
-![png](Stitching%20Tutorial_files/Stitching%20Tutorial_14_0.png)
+![png](Stitching%20Tutorial_files/Stitching%20Tutorial_12_0.png)
     
 
 
@@ -169,7 +162,7 @@ With a `confidence_threshold`, which is introduced in detail in the next step, w
 
 
 ```python
-all_relevant_matches = matcher.draw_matches_matrix(imgs, features, matches, conf_thresh=1, 
+all_relevant_matches = matcher.draw_matches_matrix(medium_imgs, features, matches, conf_thresh=1, 
                                                    inliers=True, matchColor=(0, 255, 0))
 
 for idx1, idx2, img in all_relevant_matches:
@@ -182,7 +175,7 @@ for idx1, idx2, img in all_relevant_matches:
 
 
     
-![png](Stitching%20Tutorial_files/Stitching%20Tutorial_21_1.png)
+![png](Stitching%20Tutorial_files/Stitching%20Tutorial_19_1.png)
     
 
 
@@ -191,7 +184,7 @@ for idx1, idx2, img in all_relevant_matches:
 
 
     
-![png](Stitching%20Tutorial_files/Stitching%20Tutorial_21_3.png)
+![png](Stitching%20Tutorial_files/Stitching%20Tutorial_19_3.png)
     
 
 
@@ -227,11 +220,18 @@ We now want to subset all variables we've created till here, incl. the attribute
 
 
 ```python
-names, sizes, imgs, features, matches = subsetter.subset(img_handler.img_names,
-                                                         img_handler.img_sizes,
-                                                         imgs, features, matches)
+indices = subsetter.get_indices_to_keep(features, matches)
 
-img_handler.img_names, img_handler.img_sizes = names, sizes
+medium_imgs = subsetter.subset_list(medium_imgs, indices)
+low_imgs = subsetter.subset_list(low_imgs, indices)
+final_imgs = subsetter.subset_list(final_imgs, indices)
+features = subsetter.subset_list(features, indices)
+matches = subsetter.subset_matches(matches, indices)
+
+img_names = subsetter.subset_list(img_handler.img_names, indices)
+img_sizes = subsetter.subset_list(img_handler.img_sizes, indices)
+
+img_handler.img_names, img_handler.img_sizes = img_names, img_sizes
 
 print(img_handler.img_names)
 print(matcher.get_confidence_matrix(matches))
@@ -322,13 +322,13 @@ plot_images(warped_low_masks, (10,10))
 
 
     
-![png](Stitching%20Tutorial_files/Stitching%20Tutorial_37_0.png)
+![png](Stitching%20Tutorial_files/Stitching%20Tutorial_35_0.png)
     
 
 
 
     
-![png](Stitching%20Tutorial_files/Stitching%20Tutorial_37_1.png)
+![png](Stitching%20Tutorial_files/Stitching%20Tutorial_35_1.png)
     
 
 
@@ -365,19 +365,19 @@ for img, corner in zip(warped_final_imgs, final_corners):
 
 
     
-![png](Stitching%20Tutorial_files/Stitching%20Tutorial_41_0.png)
+![png](Stitching%20Tutorial_files/Stitching%20Tutorial_39_0.png)
     
 
 
 
     
-![png](Stitching%20Tutorial_files/Stitching%20Tutorial_41_1.png)
+![png](Stitching%20Tutorial_files/Stitching%20Tutorial_39_1.png)
     
 
 
 
     
-![png](Stitching%20Tutorial_files/Stitching%20Tutorial_41_2.png)
+![png](Stitching%20Tutorial_files/Stitching%20Tutorial_39_2.png)
     
 
 
@@ -404,7 +404,7 @@ plot_image(mask, (5,5))
 
 
     
-![png](Stitching%20Tutorial_files/Stitching%20Tutorial_45_0.png)
+![png](Stitching%20Tutorial_files/Stitching%20Tutorial_43_0.png)
     
 
 
@@ -434,7 +434,7 @@ plot_image(plot, (5,5))
 
 
     
-![png](Stitching%20Tutorial_files/Stitching%20Tutorial_50_0.png)
+![png](Stitching%20Tutorial_files/Stitching%20Tutorial_48_0.png)
     
 
 
@@ -451,7 +451,7 @@ plot_image(plot, (5,5))
 
 
     
-![png](Stitching%20Tutorial_files/Stitching%20Tutorial_52_0.png)
+![png](Stitching%20Tutorial_files/Stitching%20Tutorial_50_0.png)
     
 
 
@@ -466,7 +466,7 @@ plot_image(plot, (5,5))
 
 
     
-![png](Stitching%20Tutorial_files/Stitching%20Tutorial_54_0.png)
+![png](Stitching%20Tutorial_files/Stitching%20Tutorial_52_0.png)
     
 
 
@@ -481,7 +481,7 @@ plot_image(plot, (2.5,2.5))
 
 
     
-![png](Stitching%20Tutorial_files/Stitching%20Tutorial_56_0.png)
+![png](Stitching%20Tutorial_files/Stitching%20Tutorial_54_0.png)
     
 
 
@@ -516,19 +516,19 @@ for img, corner in zip(cropped_final_imgs, final_corners):
 
 
     
-![png](Stitching%20Tutorial_files/Stitching%20Tutorial_60_0.png)
+![png](Stitching%20Tutorial_files/Stitching%20Tutorial_58_0.png)
     
 
 
 
     
-![png](Stitching%20Tutorial_files/Stitching%20Tutorial_60_1.png)
+![png](Stitching%20Tutorial_files/Stitching%20Tutorial_58_1.png)
     
 
 
 
     
-![png](Stitching%20Tutorial_files/Stitching%20Tutorial_60_2.png)
+![png](Stitching%20Tutorial_files/Stitching%20Tutorial_58_2.png)
     
 
 
@@ -561,7 +561,7 @@ plot_images(seam_masks_plots, (15,10))
 
 
     
-![png](Stitching%20Tutorial_files/Stitching%20Tutorial_63_0.png)
+![png](Stitching%20Tutorial_files/Stitching%20Tutorial_61_0.png)
     
 
 
@@ -614,7 +614,7 @@ plot_image(panorama, (20,20))
 
 
     
-![png](Stitching%20Tutorial_files/Stitching%20Tutorial_68_0.png)
+![png](Stitching%20Tutorial_files/Stitching%20Tutorial_66_0.png)
     
 
 
@@ -628,7 +628,7 @@ plot_image(blended_seam_masks, (5,5))
 
 
     
-![png](Stitching%20Tutorial_files/Stitching%20Tutorial_70_0.png)
+![png](Stitching%20Tutorial_files/Stitching%20Tutorial_68_0.png)
     
 
 
@@ -642,13 +642,13 @@ plot_image(seam_finder.draw_seam_polygons(panorama, blended_seam_masks), (15,10)
 
 
     
-![png](Stitching%20Tutorial_files/Stitching%20Tutorial_72_0.png)
+![png](Stitching%20Tutorial_files/Stitching%20Tutorial_70_0.png)
     
 
 
 
     
-![png](Stitching%20Tutorial_files/Stitching%20Tutorial_72_1.png)
+![png](Stitching%20Tutorial_files/Stitching%20Tutorial_70_1.png)
     
 
 
@@ -672,7 +672,7 @@ plot_image(panorama, (20,20))
 
 
     
-![png](Stitching%20Tutorial_files/Stitching%20Tutorial_75_0.png)
+![png](Stitching%20Tutorial_files/Stitching%20Tutorial_73_0.png)
     
 
 
@@ -701,7 +701,7 @@ plot_image(panorama, (20,20))
 
 
     
-![png](Stitching%20Tutorial_files/Stitching%20Tutorial_77_0.png)
+![png](Stitching%20Tutorial_files/Stitching%20Tutorial_75_0.png)
     
 
 
@@ -749,7 +749,7 @@ for ax in axs.flat:
 
 
     
-![png](Stitching%20Tutorial_files/Stitching%20Tutorial_80_0.png)
+![png](Stitching%20Tutorial_files/Stitching%20Tutorial_78_0.png)
     
 
 
