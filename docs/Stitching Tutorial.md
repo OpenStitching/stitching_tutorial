@@ -55,9 +55,6 @@ low_imgs = list(img_handler.resize_to_low_resolution(medium_imgs))
 final_imgs = list(img_handler.resize_to_final_resolution())
 ```
 
-    SURF not available
-    
-
 **NOTE:** Everytime `list()` is called in this notebook means that the function returns a generator (generators improve the overall stitching performance). To get all elements at once we use `list(generator_object)`  
 
 
@@ -92,9 +89,9 @@ print(f"Final Size:    {final_size}  -> {'{:,}'.format(np.prod(final_size))} px 
 
 ## Find Features
 
-On the medium images, we now want to find features that can describe conspicuous elements within the images which might be found in other images as well. The class which can be used is the `FeatureDetector` class. Default `detector` is SURF, if  [opencv_contrib](https://github.com/opencv/opencv_contrib) is not available, it's ORB.
+On the medium images, we now want to find features that can describe conspicuous elements within the images which might be found in other images as well. The class which can be used is the `FeatureDetector` class.
 
-`FeatureDetector(detector='surf'/'orb', nfeatures=500)`
+`FeatureDetector(detector='orb', nfeatures=500)`
 
 
 ```python
@@ -660,7 +657,8 @@ All the functionality above is automated within the `Stitcher` class:
 
 
 ```python
-from stitching.stitcher import Stitcher
+from stitching import Stitcher
+
 stitcher = Stitcher()
 panorama = stitcher.stitch(weir_imgs)
 ```
@@ -676,24 +674,35 @@ plot_image(panorama, (20,20))
     
 
 
-## Affine Scans
+## Affine Stitcher
 
-For images that were obtained on e.g. a flatbed scanner affine transformations are sufficient. The next example shows which parameters need to be specified: 
+For images that were obtained on e.g. a flatbed scanner affine transformations are sufficient. The `AffineStitcher` convenience class sets the needed parameters as default:
+
+`AffineStitcher(**kwargs)`
 
 
 ```python
-settings = {"matcher_type": "affine",   
-            "estimator": "affine", 
-            "adjuster": "affine",        
-            "wave_correct_kind": "no",  
-            "warper_type": "affine",      
-            
-            # The whole plan should be considered
+from stitching import AffineStitcher
+
+print(AffineStitcher.AFFINE_DEFAULTS)
+# Comparison:
+# print(Stitcher.DEFAULT_SETTINGS)
+# print(AffineStitcher.DEFAULT_SETTINGS)
+```
+
+    {'estimator': 'affine', 'wave_correct_kind': 'no', 'matcher_type': 'affine', 'adjuster': 'affine', 'warper_type': 'affine', 'compensator': 'no'}
+    
+
+We can now process the Budapest example (with two additional parameters)
+
+
+```python
+settings = {# The whole plan should be considered
             "crop": False,
             # The matches confidences aren't that good
             "confidence_threshold": 0.5}    
 
-stitcher = Stitcher(**settings)
+stitcher = AffineStitcher(**settings)
 panorama = stitcher.stitch(budapest_imgs)
 
 plot_image(panorama, (20,20))
@@ -701,7 +710,7 @@ plot_image(panorama, (20,20))
 
 
     
-![png](Stitching%20Tutorial_files/Stitching%20Tutorial_75_0.png)
+![png](Stitching%20Tutorial_files/Stitching%20Tutorial_77_0.png)
     
 
 
@@ -749,7 +758,7 @@ for ax in axs.flat:
 
 
     
-![png](Stitching%20Tutorial_files/Stitching%20Tutorial_78_0.png)
+![png](Stitching%20Tutorial_files/Stitching%20Tutorial_80_0.png)
     
 
 
