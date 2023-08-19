@@ -35,24 +35,25 @@ def get_image_paths(img_set):
 weir_imgs = get_image_paths('weir')
 budapest_imgs = get_image_paths('buda')
 exposure_error_imgs = get_image_paths('exp')
+barcode_imgs = get_image_paths('barc')
+barcode_masks = get_image_paths('mask')
 ```
 
 ## Resize Images
 
-The first step is to resize the images to medium (and later to low) resolution. The class which can be used is the `ImageHandler` class. If the images should not be stitched on full resolution, this can be achieved by setting the `final_megapix` parameter to a number above 0. 
+The first step is to resize the images to medium (and later to low) resolution. The class which can be used is the `Images` class. If the images should not be stitched on full resolution, this can be achieved by setting the `final_megapix` parameter to a number above 0. 
 
-`ImageHandler(medium_megapix=0.6, low_megapix=0.1, final_megapix=-1)`
+`Images.of(images, medium_megapix=0.6, low_megapix=0.1, final_megapix=-1)`
 
 
 ```python
-from stitching.image_handler import ImageHandler
+from stitching.images import Images
 
-img_handler = ImageHandler()
-img_handler.set_img_names(weir_imgs)
+images = Images.of(weir_imgs)
 
-medium_imgs = list(img_handler.resize_to_medium_resolution())
-low_imgs = list(img_handler.resize_to_low_resolution(medium_imgs))
-final_imgs = list(img_handler.resize_to_final_resolution())
+medium_imgs = list(images.resize(Images.Resolution.MEDIUM))
+low_imgs = list(images.resize(Images.Resolution.LOW))
+final_imgs = list(images.resize(Images.Resolution.FINAL))
 ```
 
 **NOTE:** Everytime `list()` is called in this notebook means that the function returns a generator (generators improve the overall stitching performance). To get all elements at once we use `list(generator_object)`  
@@ -70,10 +71,10 @@ plot_images(low_imgs, (20,20))
 
 
 ```python
-original_size = img_handler.img_sizes[0]
-medium_size = img_handler.get_image_size(medium_imgs[0])
-low_size = img_handler.get_image_size(low_imgs[0])
-final_size = img_handler.get_image_size(final_imgs[0])
+original_size = images.sizes[0]
+medium_size = images.get_image_size(medium_imgs[0])
+low_size = images.get_image_size(low_imgs[0])
+final_size = images.get_image_size(final_imgs[0])
 
 print(f"Original Size: {original_size}  -> {'{:,}'.format(np.prod(original_size))} px ~ 1 MP")
 print(f"Medium Size:   {medium_size}  -> {'{:,}'.format(np.prod(medium_size))} px ~ 0.6 MP")
@@ -196,7 +197,7 @@ Above we saw that the noise image has no connection to the other images which ar
 from stitching.subsetter import Subsetter
 
 subsetter = Subsetter()
-dot_notation = subsetter.get_matches_graph(img_handler.img_names, matches)
+dot_notation = subsetter.get_matches_graph(images.names, matches)
 print(dot_notation)
 ```
 
@@ -225,12 +226,9 @@ final_imgs = subsetter.subset_list(final_imgs, indices)
 features = subsetter.subset_list(features, indices)
 matches = subsetter.subset_matches(matches, indices)
 
-img_names = subsetter.subset_list(img_handler.img_names, indices)
-img_sizes = subsetter.subset_list(img_handler.img_sizes, indices)
+images.subset(indices)
 
-img_handler.img_names, img_handler.img_sizes = img_names, img_sizes
-
-print(img_handler.img_names)
+print(images.names)
 print(matcher.get_confidence_matrix(matches))
 ```
 
@@ -289,8 +287,8 @@ Warp low resolution images
 
 
 ```python
-low_sizes = img_handler.get_low_img_sizes()
-camera_aspect = img_handler.get_medium_to_low_ratio()      # since cameras were obtained on medium imgs
+low_sizes = images.get_scaled_img_sizes(Images.Resolution.LOW)
+camera_aspect = images.get_ratio(Images.Resolution.MEDIUM, Images.Resolution.LOW)  # since cameras were obtained on medium imgs
 
 warped_low_imgs = list(warper.warp_images(low_imgs, cameras, camera_aspect))
 warped_low_masks = list(warper.create_and_warp_masks(low_sizes, cameras, camera_aspect))
@@ -301,8 +299,8 @@ Warp final resolution images
 
 
 ```python
-final_sizes = img_handler.get_final_img_sizes()
-camera_aspect = img_handler.get_medium_to_final_ratio()    # since cameras were obtained on medium imgs
+final_sizes = images.get_scaled_img_sizes(Images.Resolution.FINAL)
+camera_aspect = images.get_ratio(Images.Resolution.MEDIUM, Images.Resolution.FINAL)
 
 warped_final_imgs = list(warper.warp_images(final_imgs, cameras, camera_aspect))
 warped_final_masks = list(warper.create_and_warp_masks(final_sizes, cameras, camera_aspect))
@@ -492,7 +490,7 @@ cropped_low_masks = list(cropper.crop_images(warped_low_masks))
 cropped_low_imgs = list(cropper.crop_images(warped_low_imgs))
 low_corners, low_sizes = cropper.crop_rois(low_corners, low_sizes)
 
-lir_aspect = img_handler.get_low_to_final_ratio()  # since lir was obtained on low imgs
+lir_aspect = images.get_ratio(Images.Resolution.LOW, Images.Resolution.FINAL)  # since lir was obtained on low imgs
 cropped_final_masks = list(cropper.crop_images(warped_final_masks, lir_aspect))
 cropped_final_imgs = list(cropper.crop_images(warped_final_imgs, lir_aspect))
 final_corners, final_sizes = cropper.crop_rois(final_corners, final_sizes, lir_aspect)
@@ -660,8 +658,16 @@ All the functionality above is automated within the `Stitcher` class:
 from stitching import Stitcher
 
 stitcher = Stitcher()
-panorama = stitcher.stitch(weir_imgs)
+panorama = stitcher.stitch(weir_imgs)  # the user is warned that only a subset of input images is stitched
 ```
+
+    C:\Users\laweb\Envs\stitching\lib\site-packages\stitching\subsetter.py:32: StitchingWarning: Not all images are included in the final panorama.
+                              If this is not intended, use the 'matches_graph_dot_file'
+                              parameter to analyze your matches. You might want to
+                              lower the 'confidence_threshold' or try another 'detector'
+                              to include all your images.
+      warnings.warn(
+    
 
 
 ```python
@@ -761,6 +767,42 @@ for ax in axs.flat:
 ![png](Stitching%20Tutorial_files/Stitching%20Tutorial_80_0.png)
     
 
+
+## Feature Masking
+
+Sometimes specific parts of your images disrupt the stitching workflow or you only want to match at specific parts of your images. See e.g. how the QR-Code manipulates the stitching:
+
+
+```python
+stitcher = Stitcher(crop=False)
+panorama = stitcher.stitch(barcode_imgs)
+
+plot_image(panorama, (20,20))
+```
+
+
+    
+![png](Stitching%20Tutorial_files/Stitching%20Tutorial_82_0.png)
+    
+
+
+With the feature masks you can exclude the QR-Code areas of your images from feature detection and matching:
+
+
+```python
+stitcher = Stitcher()
+panorama = stitcher.stitch(barcode_imgs, barcode_masks)
+
+plot_image(panorama, (20,20))
+```
+
+
+    
+![png](Stitching%20Tutorial_files/Stitching%20Tutorial_84_0.png)
+    
+
+
+See the [Pull Request](https://github.com/OpenStitching/stitching/pull/130) for more detailed intermediate images
 
 
 ```python
